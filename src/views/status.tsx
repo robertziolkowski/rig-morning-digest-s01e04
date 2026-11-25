@@ -1,6 +1,18 @@
 import type { Status } from '../status.js';
 
-export function StatusBoard({ status }: { status: Status }) {
+export type DigestCounts = {
+  ok: number;
+  retry: number;
+  fail: number;
+};
+
+export function StatusBoard({
+  status,
+  digestCounts,
+}: {
+  status: Status;
+  digestCounts?: Record<string, DigestCounts>;
+}) {
   return (
     <>
       <h1>status</h1>
@@ -19,9 +31,18 @@ export function StatusBoard({ status }: { status: Status }) {
         <p class="mute">nothing in runs/</p>
       ) : (
         <ul>
-          {status.nights.map((n) => (
-            <li>{n}</li>
-          ))}
+          {status.nights.map((night) => {
+            const counts = digestCounts?.[night];
+
+            return (
+              <li>
+                <a href={`/digest/${night}`}>{night}</a>
+                {counts ? (
+                  <span class="mute"> · ok {counts.ok} · retry {counts.retry} · fail {counts.fail}</span>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       )}
     </>
